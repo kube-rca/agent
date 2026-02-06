@@ -10,6 +10,7 @@ from app.clients.strands_agent import AnalysisEngine, StrandsAnalysisEngine
 from app.clients.summary_store import PostgresSummaryStore, SummaryStore
 from app.clients.tempo import TempoClient
 from app.core.config import Settings, load_settings
+from app.core.masking import RegexMasker, build_masker
 from app.services.analysis import AnalysisService
 
 logger = logging.getLogger(__name__)
@@ -46,6 +47,12 @@ def get_prometheus_client() -> PrometheusClient | None:
 
 
 @lru_cache
+def get_masker() -> RegexMasker:
+    settings = get_settings()
+    return build_masker(settings.masking_regex_list)
+
+
+@lru_cache
 def get_analysis_engine() -> AnalysisEngine | None:
     settings = get_settings()
 
@@ -60,6 +67,7 @@ def get_analysis_engine() -> AnalysisEngine | None:
         get_k8s_client(),
         get_prometheus_client(),
         get_tempo_client(),
+        masker=get_masker(),
         model_config=model_config,
     )
 
@@ -89,6 +97,7 @@ def get_analysis_service() -> AnalysisService:
     return AnalysisService(
         get_k8s_client(),
         get_analysis_engine(),
+        masker=get_masker(),
         prometheus_enabled=prometheus_client is not None,
         tempo_client=tempo_client,
         tempo_enabled=tempo_client is not None,

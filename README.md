@@ -222,6 +222,7 @@ Summarizes a resolved incident with all associated alerts.
 | `PROMPT_MAX_LOG_LINES` | Max log lines in prompt | `25` |
 | `PROMPT_MAX_EVENTS` | Max events in prompt | `25` |
 | `PROMPT_SUMMARY_MAX_ITEMS` | Max session summaries | `3` |
+| `MASKING_REGEX_LIST_JSON` | JSON array of regex patterns for masking before LLM/DB response flows | `[]` |
 
 ### Session Storage (Optional)
 
@@ -302,6 +303,20 @@ Auto-regenerate OpenAPI on commit:
 ```bash
 git config core.hooksPath .githooks
 ```
+
+---
+
+## Contributing
+
+### Merge Policy (release-please)
+
+release-please parses conventional commits; merge commits that include the PR title
+can be double-counted in the changelog.
+
+- Prefer `Squash and merge` or `Rebase and merge`.
+- If `Create a merge commit` is used, keep the PR title non-conventional
+  (e.g., "Merge PR #123").
+- Use Conventional Commits for change commits that should appear in the changelog.
 
 ---
 
