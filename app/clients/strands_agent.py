@@ -15,6 +15,7 @@ from app.clients.llm_providers import LLMProvider, ModelConfig, create_model
 from app.clients.prometheus import PrometheusClient
 from app.clients.session_repository import PostgresSessionRepository
 from app.clients.strands_patch import apply_gemini_thought_signature_patch
+from app.clients.tempo import TempoClient, build_traceql_query
 from app.core.config import Settings
 
 logger = logging.getLogger(__name__)
@@ -38,6 +39,7 @@ class StrandsAnalysisEngine:
         settings: Settings,
         k8s_client: KubernetesClient,
         prometheus_client: PrometheusClient | None = None,
+        tempo_client: TempoClient | None = None,
         model_config: ModelConfig | None = None,
     ) -> None:
         # Apply Gemini patch only when using Gemini provider
@@ -51,7 +53,7 @@ class StrandsAnalysisEngine:
             )
         self._settings = settings
         self._model_config = model_config
-        self._tools = _build_tools(k8s_client, prometheus_client)
+        self._tools = _build_tools(k8s_client, prometheus_client, tempo_client)
         self._cache_lock = Lock()
         self._agent_cache: OrderedDict[str, _AgentCacheEntry] = OrderedDict()
         self._cache_size = max(settings.agent_cache_size, 1)
@@ -141,6 +143,7 @@ class StrandsAnalysisEngine:
 def _build_tools(
     k8s_client: KubernetesClient,
     prometheus_client: PrometheusClient | None,
+    tempo_client: TempoClient | None,
 ) -> list[object]:
     @tool
     def get_pod_status(namespace: str, pod_name: str) -> dict[str, object]:
@@ -294,6 +297,46 @@ def _build_tools(
         return prometheus_client.query_range(query, start=start, end=end, step=step)
 
     @tool
+    def discover_tempo() -> dict[str, object]:
+        """Return the configured Tempo endpoint (TEMPO_URL)."""
+        if tempo_client is None:
+            return {"warning": "tempo client not configured"}
+        return tempo_client.describe_endpoint()
+
+    @tool
+    def search_tempo_traces(
+        start: str,
+        end: str,
+        service_name: str | None = None,
+        namespace: str | None = None,
+        query: str | None = None,
+        limit: int = 5,
+    ) -> dict[str, object]:
+        """Search traces from Tempo.
+
+        Use either:
+        - query: custom TraceQL string
+        - service_name/namespace: auto-build TraceQL query
+        """
+        if tempo_client is None:
+            return {"warning": "tempo client not configured"}
+
+        traceql = query or build_traceql_query(service_name, namespace)
+        return tempo_client.search_traces(
+            query=traceql,
+            start=start,
+            end=end,
+            limit=limit,
+        )
+
+    @tool
+    def get_tempo_trace(trace_id: str) -> dict[str, object]:
+        """Fetch a full Tempo trace payload by trace ID."""
+        if tempo_client is None:
+            return {"warning": "tempo client not configured"}
+        return tempo_client.get_trace(trace_id)
+
+    @tool
     def list_pods_in_namespace(
         namespace: str, label_selector: str | None = None
     ) -> list[dict[str, object]]:
@@ -329,6 +372,14 @@ def _build_tools(
                 list_prometheus_metrics,
                 query_prometheus,
                 query_prometheus_range,
+            ]
+        )
+    if tempo_client is not None:
+        tools.extend(
+            [
+                discover_tempo,
+                search_tempo_traces,
+                get_tempo_trace,
             ]
         )
     return tools
