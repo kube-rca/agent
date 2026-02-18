@@ -1,5 +1,33 @@
 # Changelog
 
+## [1.1.0](https://github.com/kube-rca/agent/compare/1.0.0...1.1.0) (2026-02-18)
+
+
+### Features
+
+* **agent:** add generic manifest read tools ([ebe49e7](https://github.com/kube-rca/agent/commit/ebe49e724aa19a4e1a55269de33cdb146078077b))
+* **agent:** add regex masking for llm and storage flows (KAN-146) ([#10](https://github.com/kube-rca/agent/issues/10)) ([e1aad94](https://github.com/kube-rca/agent/commit/e1aad94c94db2882d1805ec2b34cb1e4865c2e37))
+* **agent:** enrich daemonset and events context (KAN-79) ([8c678bc](https://github.com/kube-rca/agent/commit/8c678bc51bc04059abe6a1b9c3e7a7b18eac7c29))
+* **agent:** enrich daemonset and events context (KAN-79) ([ace5c00](https://github.com/kube-rca/agent/commit/ace5c003ac9c4877256d6088a69e39e66ecff4ea))
+* **agent:** integrate tempo trace context into analysis (KAN-145) ([#9](https://github.com/kube-rca/agent/issues/9)) ([e17cd5e](https://github.com/kube-rca/agent/commit/e17cd5efe834e0680393a8fbf62dd0f2bdf47365))
+* 채팅 기능 추가 (KAN-158) ([4fd3051](https://github.com/kube-rca/agent/commit/4fd3051219d31d5d1e07a8cb5e4f62497e975d4d))
+
+
+### Bug Fixes
+
+* **agent:** align tempo timeout default and docs (KAN-145) ([a19bd6e](https://github.com/kube-rca/agent/commit/a19bd6eb34134133264a7af23e9958885f112b09))
+* build error ([4751f41](https://github.com/kube-rca/agent/commit/4751f4104f96f6699f322e7576029f7a55f6efd7))
+* route agent image pushes to component repository ([35c6b84](https://github.com/kube-rca/agent/commit/35c6b84f922962fedcf4d3bad8227bb1ddb41f35))
+* **tempo:** normalize time window and surface query failures ([f1e4cf8](https://github.com/kube-rca/agent/commit/f1e4cf8753593665c0a1511fb8bde2ac02e9ccfd))
+
+
+### Documentation
+
+* add release-please merge policy ([#8](https://github.com/kube-rca/agent/issues/8)) ([52c8e91](https://github.com/kube-rca/agent/commit/52c8e91193d3df3d96a1ec311365ffeb63bb8a95))
+* **agent:** align README with current API schema ([b3755af](https://github.com/kube-rca/agent/commit/b3755afa50d9b3ca5e5fef286c84689b060810d4))
+* **agent:** update README for generic manifest tools ([974a17f](https://github.com/kube-rca/agent/commit/974a17f752cb89c18d7da8308d883042ea467eb5))
+* **license:** align with MIT ([14719ed](https://github.com/kube-rca/agent/commit/14719ed1eb9010b7759b145952680e9cb03a3728))
+
 ## [1.0.0](https://github.com/kube-rca/agent/compare/0.1.0...1.0.0) (2026-02-01)
 
 
